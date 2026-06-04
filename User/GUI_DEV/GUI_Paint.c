@@ -517,6 +517,7 @@ parameter:
     Color_Background : Select the background color of the English character
     Color_Foreground : Select the foreground color of the English character
 ******************************************************************************/
+unsigned char buf2[1000];
 void Paint_DrawChar(UWORD Xpoint, UWORD Ypoint, const char Acsii_Char,
                     sFONT* Font, UWORD Color_Background, UWORD Color_Foreground)
 {
@@ -526,10 +527,11 @@ void Paint_DrawChar(UWORD Xpoint, UWORD Ypoint, const char Acsii_Char,
         Debug("Paint_DrawChar Input exceeds the normal display range\r\n");
         return;
     }
-
+    //The bitmaps are stored as a 1d array so we want to calc the first row addr of this char
+    //(offset from space  to this char in ascii)*(number of bytes of 1 char bitmap),the height is same  as the pixels,the width will have
+    //padding bits when it is not a multiple of 8
     uint32_t Char_Offset = (Acsii_Char - ' ') * Font->Height * (Font->Width / 8 + (Font->Width % 8 ? 1 : 0));
     const unsigned char *ptr = &Font->table[Char_Offset];
-
     for (Page = 0; Page < Font->Height; Page ++ ) {
         for (Column = 0; Column < Font->Width; Column ++ ) {
 
@@ -548,12 +550,64 @@ void Paint_DrawChar(UWORD Xpoint, UWORD Ypoint, const char Acsii_Char,
                 }
             }
             //One pixel is 8 bits
-            if (Column % 8 == 7)
-                ptr++;
+            if (Column % 8 == 7)//if width>8 1 row has more than 8 pixel.When we read to the end of first byte(bit 7)
+            	ptr++;          //we need to jump to the next byte,so here ptr++
+
         }// Write a line
-        if (Font->Width % 8 != 0)
-            ptr++;
+        if (Font->Width % 8 != 0)//if width is not a multiple of 8 means there will be padding bits in the end of a row
+        	ptr++;					//so we need to skip them and move to next row
+
     }// Write all
+}
+//self-defined
+void Paint_DrawChar_new(UWORD Xpoint, UWORD Ypoint, const char Acsii_Char,
+                    sFONT* Font, UWORD Color_Background, UWORD Color_Foreground)
+{
+    UWORD Page, Column;
+
+    if (Xpoint > Paint.Width || Ypoint > Paint.Height) {
+        Debug("Paint_DrawChar Input exceeds the normal display range\r\n");
+        return;
+    }
+    //The bitmaps are stored as a 1d array so we want to calc the first row addr of this char
+    //(offset from space  to this char in ascii)*(number of bytes of 1 char bitmap),the height is same  as the pixels,the width will have
+    //padding bits when it is not a multiple of 8
+    uint32_t Char_Offset = (Acsii_Char - ' ') * Font->Height * (Font->Width / 8 + (Font->Width % 8 ? 1 : 0));
+    const unsigned char *ptr = &Font->table[Char_Offset];
+    uint16_t counter=0;
+    for (Page = 0; Page < Font->Height; Page ++ ) {
+        for (Column = 0; Column < Font->Width; Column ++ ) {
+
+            //To determine whether the font background color and screen background color is consistent
+//            if (FONT_BACKGROUND == Color_Background) { //this process is to speed up the scan
+//                if (*ptr & (0x80 >> (Column % 8))){
+//                	buf2[counter++]=(Color_Foreground>> 8) & 0xFF;
+//                	buf2[counter++]=(Color_Foreground&0xFF);
+//                }
+////                    Paint_SetPixel(Xpoint + Column, Ypoint + Page, Color_Foreground);
+//                    // Paint_DrawPoint(Xpoint + Column, Ypoint + Page, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+//            } else {
+                if (*ptr & (0x80 >> (Column % 8))) {
+                	buf2[counter++]=(Color_Foreground>> 8) & 0xFF;
+                	buf2[counter++]=(Color_Foreground&0xFF);
+                    //Paint_SetPixel(Xpoint + Column, Ypoint + Page, Color_Foreground);
+                    // Paint_DrawPoint(Xpoint + Column, Ypoint + Page, Color_Foreground, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                } else {
+                	buf2[counter++]=(Color_Background>> 8) & 0xFF;
+                	buf2[counter++]=(Color_Background&0xFF);
+                    //Paint_SetPixel(Xpoint + Column, Ypoint + Page, Color_Background);
+                    // Paint_DrawPoint(Xpoint + Column, Ypoint + Page, Color_Background, DOT_PIXEL_DFT, DOT_STYLE_DFT);
+                }
+//            }
+            //One pixel is 8 bits
+            if (Column % 8 == 7)//if width>8 1 row has more than 8 pixel.When we read to the end of first byte(bit 7)
+            	ptr++;          //we need to jump to the next byte,so here ptr++
+
+        }// Write a line
+        if (Font->Width % 8 != 0)//if width is not a multiple of 8 means there will be padding bits in the end of a row
+        	ptr++;				//so we need to skip them and move to next row
+    }// Write all
+    FLUSH((const unsigned char*)buf2,Font->Height*Font->Width*2,Xpoint,Ypoint,Xpoint+Font->Width-1,Ypoint+Font->Height-1);
 }
 
 /******************************************************************************
@@ -589,8 +643,8 @@ void Paint_DrawString_EN(UWORD Xstart, UWORD Ystart, const char * pString,
             Xpoint = Xstart;
             Ypoint = Ystart;
         }
-        Paint_DrawChar(Xpoint, Ypoint, * pString, Font, Color_Background, Color_Foreground);
-
+        //Paint_DrawChar(Xpoint, Ypoint, * pString, Font, Color_Background, Color_Foreground);
+        Paint_DrawChar_new(Xpoint, Ypoint, * pString, Font, Color_Background, Color_Foreground);
         //The next character of the address
         pString ++;
 

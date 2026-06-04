@@ -39,8 +39,8 @@ typedef struct obs{
 	unsigned char*image;
 	uint16_t w;
 	uint16_t h;
-	uint16_t x;
-	uint16_t y;
+	int16_t x;
+	int16_t y;
 	uint16_t vis;
 }obstacle;
 
@@ -52,4 +52,5 @@ void lcd_init();
 void dino();
 void map_init();
 char collision(int8_t);
+void score(int32_t counter);
 #endif

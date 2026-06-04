@@ -107,11 +107,13 @@ void map_init(){
 	//dino moves
 	Dino_j.image=dino_jump;Dino_j.w=26;Dino_j.h=27;Dino_j.y=135-Dino_j.h;
 	Dino_s.image=dino_squat;Dino_s.w=40;Dino_s.h=12;Dino_s.y=135-Dino_s.h;
+	Paint_DrawString_EN(100,1,"Score:",&Font20,0xFFFF,0x0000);
 }
 
 int8_t jump=0,squat=0;
 int8_t buzz=0;
 int16_t counter=5;
+int32_t distance=0;
 char collision(int8_t squat){
 	obstacle*Dino;
 	if(squat)
@@ -191,7 +193,7 @@ void map(){
 	pos-=speed;
 	if(pos<0)
 		pos=200;
-
+	score(++distance);
 	DEV_Delay_ms(10);
 }
 
@@ -247,5 +249,12 @@ void dino(){
 
 //	printf("%d\n",counter);
 	DEV_Delay_ms(10);
+}
+void score(int32_t counter){
+	if(counter<2)
+		Paint_DrawNum(191,1,counter,&Font20,0xFFFF,0x0000);
+	else
+		Paint_DrawNum(191,1,counter,&Font20,0xFFFF,0xF800);
+
 }
 

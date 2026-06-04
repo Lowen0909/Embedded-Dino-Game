@@ -139,11 +139,11 @@ int main(void)
 		map();
 		dino();
 	}
-//	if(collision(squat)){
-//		flag=1;
-//		printf("\rcollision\n");
-//		break;
-//	}
+	if(collision(squat)){
+		flag=1;
+		printf("\rcollision\n");
+		break;
+	}
 
   }
   /* USER CODE END 3 */
