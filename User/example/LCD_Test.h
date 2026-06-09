@@ -41,7 +41,8 @@ typedef struct obs{
 	uint16_t h;
 	int16_t x;
 	int16_t y;
-	uint16_t vis;
+	uint8_t vis;
+	uint8_t active;
 }obstacle;
 
 extern int8_t jump;
@@ -52,5 +53,6 @@ void lcd_init();
 void dino();
 void map_init();
 char collision(int8_t);
-void score(int32_t counter);
+void score();
+void set_level(uint8_t);
 #endif

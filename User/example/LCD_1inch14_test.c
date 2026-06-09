@@ -77,7 +77,7 @@ void lcd_init(){
 
 
 
-
+//variable declaration
 static obstacle Boat;
 static obstacle Runner;
 static obstacle Cactus;
@@ -96,24 +96,49 @@ obstacle *obstacles[] = {
 	&Pyrimid
 
 };
-
+uint16_t levels[][6]={
+	{0,0,1,0,1,0},
+	{0,1,1,1,1,0},
+	{1,1,1,1,1,1}
+};
+uint16_t* map_num;
+int8_t tail,head;
+int8_t jump=0,squat=0;
+int8_t buzz=0;
+int16_t counter=5;
+int32_t distance=0;
+int8_t stage=0;
+//function definition
 void map_init(){
-	Boat.image=boat;Boat.w=30;Boat.h=15;Boat.y=135-Boat.h;Boat.vis=0;
-	Runner.image=runner;Runner.w=16;Runner.h=20;Runner.y=135-Runner.h;Runner.vis=0;
-	Cactus.image=cactus;Cactus.w=24;Cactus.h=28;Cactus.y=135-Cactus.h;Cactus.vis=0;
-	Rock.image=rock;Rock.w=16;Rock.h=7;Rock.y=135-Rock.h;Rock.vis=0;
-	Pyrimid.image=pyrimid;Pyrimid.w=24;Pyrimid.h=13;Pyrimid.y=135-Pyrimid.h;Pyrimid.vis=0;
-	Meteor.image=meteor;Meteor.w=12;Meteor.h=10;Meteor.y=135-20-Meteor.h;Meteor.vis=0;
+	Boat=(obstacle){.image=boat,.w=30,.h=15,.x=200,.y=135-15,.vis=0,.active=0};
+	Runner=(obstacle){.image=runner,.w=16,.h=20,.x=200,.y=135-20,.vis=0,.active=0};
+	Cactus=(obstacle){.image=cactus,.w=24,.h=28,.x=200,.y=135-28,.vis=0,.active=0};
+	Rock=(obstacle){.image=rock,.w=16,.h=7,.x=200,.y=135-7,.vis=0,.active=0};
+	Pyrimid=(obstacle){.image=pyrimid,.w=24,.h=13,.x=200,.y=135-13,.vis=0,.active=0};
+	Meteor=(obstacle){.image=meteor,.w=12,.h=10,.x=200,.y=135-15-10,.vis=0,.active=0};
+	set_level(0);
 	//dino moves
 	Dino_j.image=dino_jump;Dino_j.w=26;Dino_j.h=27;Dino_j.y=135-Dino_j.h;
 	Dino_s.image=dino_squat;Dino_s.w=40;Dino_s.h=12;Dino_s.y=135-Dino_s.h;
 	Paint_DrawString_EN(100,1,"Score:",&Font20,0xFFFF,0x0000);
 }
 
-int8_t jump=0,squat=0;
-int8_t buzz=0;
-int16_t counter=5;
-int32_t distance=0;
+void set_level(uint8_t level){
+	map_num=levels[level];
+	int16_t prev=200;
+	for(int8_t i=0;i<6;i++){
+		if(map_num[i]){
+			if(prev==200)
+				head=i;
+			printf("active");
+			obstacles[i]->active=1;
+			obstacles[i]->x=prev;
+			prev=obstacles[i]->x+obstacles[i]->w+60;
+			tail=i;
+		}
+	}
+}
+
 char collision(int8_t squat){
 	obstacle*Dino;
 	if(squat)
@@ -123,7 +148,7 @@ char collision(int8_t squat){
 	uint16_t x,y,w,h;
 	uint32_t size=sizeof(obstacles)/sizeof(obstacles[0]);
 	for(int i=0;i<size;i++){
-		if(!obstacles[i]->vis)
+		if(!obstacles[i]->active)
 			continue;
 		x=obstacles[i]->x;
 		y=obstacles[i]->y;
@@ -139,6 +164,7 @@ char collision(int8_t squat){
 			continue;
 		if(buzz)
 			buzz=0;
+		Paint_DrawString_EN(45,65,"Game Over",&Font20,0xFFFF,0xF800);
 		return 1;//overlap
 	}
 	return 0;
@@ -146,54 +172,90 @@ char collision(int8_t squat){
 
 
 void map(){
-	static int16_t pos=200;
-	int8_t speed=8;
+//	static int16_t pos=200;
 
-	if(pos>=200&&Rock.vis==0){
-		Rock.x=200;Rock.vis=1;
-
+	int8_t speed;
+	switch(stage){
+		case 0:
+			speed=10;
+			break;
+		case 1:
+			speed=15;
+			break;
+		case 2:
+			speed=20;
+			break;
+		default:
+			Paint_DrawString_EN(50,35,"Congrats!",&Font20,0xFFFF,0x0000);
+			Paint_DrawString_EN(25,65,"You beat the game!",&Font16,0xFFFF,0x0000);
+			break;
 	}
+	if(stage>2)
+		return;
 
-	if(pos<120&&Cactus.vis==0){
-		Cactus.x=200;Cactus.vis=1;
-
-	}
-
-	if(pos<30&&Meteor.vis==0){
-		Meteor.x=200;Meteor.vis=1;
-	}
+//	if(pos<=220&&pos>0&&Rock.vis==0){
+//		Rock.x=200;Rock.vis=1;
+//
+//	}else if(Rock.x>220){
+//		Rock.vis=0;
+//		Rock.x-=20;
+//	}else
+//		Rock.vis=1;
+//
+//	if(pos<120&&pos>0&&Cactus.vis==0){
+//		Cactus.x=200;Cactus.vis=1;
+//
+//	}else if(Cactus.x>220){
+//		Cactus.vis=0;
+//		Cactus.x-=20;
+//	}else
+//		Cactus.vis=1;
+//
+//	if(pos<50&&pos>0&&Meteor.vis==0){
+//		Meteor.x=200;Meteor.vis=1;
+//	}else if(Meteor.x>220){
+//		Meteor.vis=0;
+//		Meteor.x-=20;
+//	}else
+//		Meteor.vis=1;
 //	Paint_DrawImage_new(Boat.image,Boat.w*Boat.h*2, (pos+96)%212,Boat.y,Boat.w,Boat.h);
 //	Paint_DrawImage_new(Runner.image,Runner.w*Runner.h*2, (pos+72)%212,Runner.y,Runner.w,Runner.h);
-	if(Rock.vis)
-		Paint_DrawImage_new(Rock.image,Rock.w*Rock.h*2,Rock.x,Rock.y,Rock.w,Rock.h);
-	if(Meteor.vis)
-		Paint_DrawImage_new(Meteor.image,Meteor.w*Meteor.h*2,Meteor.x,Meteor.y,Meteor.w,Meteor.h);
-	if(Cactus.vis)
-		Paint_DrawImage_new(Cactus.image,Cactus.w*Cactus.h*2,Cactus.x,Cactus.y,Cactus.w,Cactus.h);
+//	if(Rock.vis)
+//		Paint_DrawImage_new(Rock.image,Rock.w*Rock.h*2,Rock.x,Rock.y,Rock.w,Rock.h);
+//	if(Meteor.vis)
+//		Paint_DrawImage_new(Meteor.image,Meteor.w*Meteor.h*2,Meteor.x,Meteor.y,Meteor.w,Meteor.h);
+//	if(Cactus.vis)
+//		Paint_DrawImage_new(Cactus.image,Cactus.w*Cactus.h*2,Cactus.x,Cactus.y,Cactus.w,Cactus.h);
 
 
-	printf("Obstacle Position is %d\r\n",pos);
-	DEV_Delay_ms(100);
-//	LCD_partial_Clear((pos+96)%212,120,30,15);
-	if(Meteor.vis)
-		LCD_partial_Clear(Meteor.x,Meteor.y,Meteor.w,Meteor.h);
-	if(Cactus.vis)
-		LCD_partial_Clear(Cactus.x,Cactus.y,Cactus.w,Cactus.h);
-    if(Rock.vis)
-    	LCD_partial_Clear(Rock.x,Rock.y,Rock.w,Rock.h);
-    uint32_t size=sizeof(obstacles)/sizeof(obstacles[0]);
+//	printf("Obstacle Position is %d\r\n",pos);
+	uint32_t size=sizeof(obstacles)/sizeof(obstacles[0]);
 	for(int i=0;i<size;i++){
-		if(!obstacles[i]->vis)
+		if(!obstacles[i]->active)
 			continue;
+		if(obstacles[i]->x<=200||obstacles[i]->vis)
+			Paint_DrawImage_new(obstacles[i]->image,obstacles[i]->w*obstacles[i]->h*2,obstacles[i]->x,obstacles[i]->y,obstacles[i]->w,obstacles[i]->h);
+
+	}
+	DEV_Delay_ms(100);
+
+	for(int i=0;i<size;i++){
+		if(!obstacles[i]->active)
+			continue;
+		if(obstacles[i]->x<=200)
+			LCD_partial_Clear(obstacles[i]->x,obstacles[i]->y,obstacles[i]->w,obstacles[i]->h);
 		obstacles[i]->x-=speed;
-		if(obstacles[i]->x<0)
-			obstacles[i]->x=200;
+
+		if(obstacles[i]->x<0){
+			obstacles[i]->x=(obstacles[tail]->x-speed>=200)?obstacles[tail]->x+obstacles[tail]->w+60-speed:260;
+			tail=i;
+		}
 	}
 
-	pos-=speed;
-	if(pos<0)
-		pos=200;
-	score(++distance);
+
+//	if(pos>0)
+//		pos-=speed;
+	score();
 	DEV_Delay_ms(10);
 }
 
@@ -205,7 +267,7 @@ void dino(){
 		Dino_j.y=135-Dino_j.h;
 	}
 //	Paint_DrawImage(cactus,pos,107,24,28);
-	printf("Dino Position is %d\r\n",pos1);
+//	printf("Dino Position is %d\r\n",pos1);
 
 
 	if(jump&&(counter==5)){
@@ -217,11 +279,11 @@ void dino(){
 		counter--;
 	}else if(jump&&counter){
 		counter--;
-		printf("\rJump counter %d\n",counter);
+//		printf("\rJump counter %d\n",counter);
 	}else if(jump){
 		jump=0;
 		counter=5;
-		printf("\rafter jump clear\n");
+//		printf("\rafter jump clear\n");
 		LCD_partial_Clear(pos1,Dino_j.y,Dino_j.w,Dino_j.h);
 		Dino_j.y=135-Dino_j.h;
 	}
@@ -234,7 +296,7 @@ void dino(){
 		counter--;
 	}else if(squat&&counter){
 		counter--;
-		printf("\rSquat counter %d\n",counter);
+//		printf("\rSquat counter %d\n",counter);
 	}else if(squat){
 		squat=0;
 		counter=5;
@@ -250,11 +312,23 @@ void dino(){
 //	printf("%d\n",counter);
 	DEV_Delay_ms(10);
 }
-void score(int32_t counter){
-	if(counter<2)
-		Paint_DrawNum(191,1,counter,&Font20,0xFFFF,0x0000);
-	else
-		Paint_DrawNum(191,1,counter,&Font20,0xFFFF,0xF800);
+void score(){
+	if(++distance<50)
+		Paint_DrawNum(191,1,distance,&Font20,0xFFFF,0x0000);
+	else if(distance<100)
+		Paint_DrawNum(191,1,distance,&Font20,0xFFFF,0xF800);
+	else{
+		Paint_DrawNum(191,1,--distance,&Font20,0xFFFF,0xFFFF);
+		distance=0;
+		stage++;
+		set_level(stage);
+		if(stage<3){
+			Paint_DrawString_EN(40,35,"Entering next level ...",&Font20,0xFFFF,0x0000);
+			DEV_Delay_ms(2000);
+			Paint_DrawString_EN(40,35,"Entering next level ...",&Font20,0xFFFF,0xFFFF);
+		}
+
+	}
 
 }
 
