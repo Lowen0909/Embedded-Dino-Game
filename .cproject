@@ -54,6 +54,7 @@
 									<listOptionValue builtIn="false" value="&quot;D:\STM32CubeIDE\workspace_1.11.0\project1\User\GUI_DEV&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;D:\STM32CubeIDE\workspace_1.11.0\project1\User\image&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;D:\STM32CubeIDE\workspace_1.11.0\project1\User\LCD&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;D:\STM32CubeIDE\workspace_1.11.0\project1\Games&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.2096630401" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -80,9 +81,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="User"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Games"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="User"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

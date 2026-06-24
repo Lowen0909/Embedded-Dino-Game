@@ -35,24 +35,24 @@
 #include "Debug.h"
 #include <stdlib.h> // malloc() free()
 
-typedef struct obs{
-	unsigned char*image;
-	uint16_t w;
-	uint16_t h;
-	int16_t x;
-	int16_t y;
-	uint8_t vis;
-	uint8_t active;
-}obstacle;
-
-extern int8_t jump;
-extern int8_t squat;
-void LCD_1in14_test(void);
-void map();
+//typedef struct obs{
+//	unsigned char*image;
+//	uint16_t w;
+//	uint16_t h;
+//	int16_t x;
+//	int16_t y;
+//	uint8_t vis;
+//	uint8_t active;
+//}obstacle;
+//
+//extern int8_t jump;
+//extern int8_t squat;
+//void LCD_1in14_test(void);
+//void map();
 void lcd_init();
-void dino();
-void map_init();
-char collision(int8_t);
-void score();
-void set_level(uint8_t);
+//void dino();
+//void map_init();
+//char collision(int8_t);
+//void score();
+//void set_level(uint8_t);
 #endif

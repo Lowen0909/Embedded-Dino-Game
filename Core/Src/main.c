@@ -29,6 +29,7 @@
 #include "fonts.h"
 #include "image.h"
 #include "LCD_Test.h"
+#include "games.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -125,7 +126,9 @@ int main(void)
   MX_RNG_Init();
   /* USER CODE BEGIN 2 */
   lcd_init();
-  map_init();
+//  map_init();
+  kart_init();
+  kart_map();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,15 +138,16 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	if(!flag){
-		map();
-		dino();
-	}
-	if(collision(squat)){
-		flag=1;
-		printf("\rcollision\n");
-		break;
-	}
+//	if(!flag){
+//		map();
+//		dino();
+//	}
+//	if(collision(squat)){
+//		flag=1;
+//		printf("\rcollision\n");
+//		break;
+//	}
+	kart_move();
 
   }
   /* USER CODE END 3 */

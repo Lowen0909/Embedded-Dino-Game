@@ -292,8 +292,8 @@ void LCD_partial_Clear(UWORD pos,UWORD height,UWORD WIDTH,UWORD HEIGHT)
 //		}
 //	 }
 
-	static uint8_t buf1[24*28*2];
-	memset(buf1,0xFF,24*28*2);
+	static uint8_t buf1[50*50*2];
+	memset(buf1,0xFF,50*50*2);
 	DEV_SPI_WRite_DMA(buf1,WIDTH*HEIGHT*2);
 	while(!spi_done);
 	spi_done=0;
