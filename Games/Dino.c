@@ -18,7 +18,7 @@ obstacle *obstacles[] = {
 	&Pyrimid
 
 };
-uint16_t levels[][6]={
+static uint16_t levels[][6]={
 	{0,0,1,0,1,0},
 	{0,1,1,1,1,0},
 	{1,1,1,1,1,1}
@@ -31,6 +31,22 @@ int16_t counter=5;
 int32_t distance=0;
 int8_t stage=0;
 //function definition
+static void set_level(uint8_t level){
+	map_num=levels[level];
+	int16_t prev=200;
+	for(int i=0;i<6;i++){
+		if(map_num[i]){
+			if(prev==200)
+				head=i;
+			printf("active");
+			obstacles[i]->active=1;
+			obstacles[i]->x=prev;
+			prev=obstacles[i]->x+obstacles[i]->w+60;
+			tail=i;
+		}
+	}
+}
+
 void map_init(){
 	Boat=(obstacle){.image=boat,.w=30,.h=15,.x=200,.y=135-15,.vis=0,.active=0};
 	Runner=(obstacle){.image=runner,.w=16,.h=20,.x=200,.y=135-20,.vis=0,.active=0};
@@ -45,21 +61,7 @@ void map_init(){
 	Paint_DrawString_EN(100,1,"Score:",&Font20,0xFFFF,0x0000);
 }
 
-void set_level(uint8_t level){
-	map_num=levels[level];
-	int16_t prev=200;
-	for(int8_t i=0;i<6;i++){
-		if(map_num[i]){
-			if(prev==200)
-				head=i;
-			printf("active");
-			obstacles[i]->active=1;
-			obstacles[i]->x=prev;
-			prev=obstacles[i]->x+obstacles[i]->w+60;
-			tail=i;
-		}
-	}
-}
+
 
 char collision(int8_t squat){
 	obstacle*Dino;

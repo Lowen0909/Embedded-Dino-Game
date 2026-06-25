@@ -23,10 +23,12 @@ void map();
 void dino();
 void map_init();
 char collision(int8_t);
-void score();
-void set_level(uint8_t);
+//void score();
+//void set_level(uint8_t);
 
 void kart_init();
 void kart_map();
 void kart_move();
+//void MEMS_Write(uint8_t address,uint8_t data);
+//void MEMS_Read(uint8_t address,uint8_t *data);
 #endif

@@ -44,13 +44,13 @@ void DEV_delay_ms(uint16_t xms )
 
 void DEV_SPI_WRite(UBYTE _dat)
 {
-	HAL_SPI_Transmit(&hspi1, (uint8_t *)&_dat, 1, 500);
+	HAL_SPI_Transmit(&hspi2, (uint8_t *)&_dat, 1, 500);
 }
 //self-defined
 void DEV_SPI_WRite_DMA(uint8_t* buf,uint32_t len)
 {
 
-	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t *)buf,len);
+	HAL_SPI_Transmit_DMA(&hspi2, (uint8_t *)buf,len);
 }
 
 int DEV_Module_Init(void)

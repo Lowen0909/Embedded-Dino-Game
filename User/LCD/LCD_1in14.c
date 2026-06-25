@@ -100,7 +100,7 @@ static void LCD_1IN14_SendData_DMA(const unsigned char *image,uint32_t len)
 //added callback
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    if(hspi == &hspi1)
+    if(hspi == &hspi2)
     {
         spi_done = 1;
     }
