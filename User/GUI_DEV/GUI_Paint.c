@@ -235,7 +235,7 @@ void Paint_SetPixel(UWORD Xpoint, UWORD Ypoint, UWORD Color)
 void Paint_SetPixel_new(UWORD* Xpoint, UWORD* Ypoint)
 {
     if(*Xpoint > Paint.Width || *Ypoint > Paint.Height){
-        Debug("Exceeding display boundaries\r\n");
+//        Debug("Exceeding display boundaries\r\n");
         return;
     }
     UWORD X=*Xpoint;
@@ -280,7 +280,7 @@ void Paint_SetPixel_new(UWORD* Xpoint, UWORD* Ypoint)
 
     // printf("x = %d, y = %d\r\n", X, Y);
     if(*Xpoint > Paint.WidthMemory || *Xpoint > Paint.HeightMemory){
-        Debug("Exceeding display boundaries\r\n");
+//        Debug("Exceeding display boundaries\r\n");
         return;
     }
 

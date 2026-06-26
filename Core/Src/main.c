@@ -142,8 +142,8 @@ int main(void)
   LIS3DSH_Y_calibrate(-1020.0, 1040.0);
   LIS3DSH_Z_calibrate(-920.0, 1040.0);
   lcd_init();
-//  map_init();
-  kart_init();
+//  Dino_Init();
+  Kart_Init();
 
   /* USER CODE END 2 */
 
@@ -154,17 +154,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	if(!flag){
-//		map();
-//		dino();
-//	}
-//	if(collision(squat)){
-//		flag=1;
-//		printf("\rcollision\n");
-//		break;
-//	}
-	kart_move();
-	kart_map();
+//	Dino_Game();
+	Kart_Game();
 
   }
   /* USER CODE END 3 */

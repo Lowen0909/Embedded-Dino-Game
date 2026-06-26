@@ -19,16 +19,17 @@ typedef struct obs{
 
 extern int8_t jump;
 extern int8_t squat;
-void map();
-void dino();
-void map_init();
-char collision(int8_t);
+void dino_map();
+void dino_move();
+void Dino_Init();
+//char collision(int8_t);
 //void score();
 //void set_level(uint8_t);
 
-void kart_init();
+void Kart_Init();
 void kart_map();
 void kart_move();
+void Kart_Game();
 //void MEMS_Write(uint8_t address,uint8_t data);
 //void MEMS_Read(uint8_t address,uint8_t *data);
 #endif
