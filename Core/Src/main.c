@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "FreeRTOS.h"
+#include "task.h"
 #include "GUI_Paint.h"
 #include "fonts.h"
 #include "image.h"
@@ -81,14 +83,67 @@ int __io_putchar(int ch)
     HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }
+TaskHandle_t menuHandle=NULL,DinoHandle=NULL,KartHandle=NULL;
+volatile int8_t up=0,down=0;
+void menu(void *pvParameters){
+	Clear_Screen();
+//	printf("in menu\r\n");
+	up=0,down=0;
+	for(;;){
+		if(up>=2){
+			up=0;
+			vTaskResume(DinoHandle);
+			vTaskSuspend(NULL);
+		}else if(up){
+			Paint_DrawString_EN(50,35,"Dino Game",&Font20,0xF800,0xFFFF);
+		}else
+			Paint_DrawString_EN(50,35,"Dino Game",&Font20,0xFFFF,0x0000);
+//		printf("up: %d\r\n",up);
+		if(down>=2){
+			down=0;
+			vTaskResume(KartHandle);
+			vTaskSuspend(NULL);
+		}else if(down){
+			Paint_DrawString_EN(50,80,"Race Game",&Font20,0xF800,0xFFFF);
+		}else
+			Paint_DrawString_EN(50,80,"Race Game",&Font20,0xFFFF,0x0000);
+//		printf("down: %d\r\n",down);
+	}
+}
+
+void Dino(void *pvParameters){
+	Clear_Screen();
+	Dino_Init();
+	for(;;){
+		Dino_Game();
+	}
+}
+
+void Kart(void *pvParameters){
+	Clear_Screen();
+	Kart_Init();
+	for(;;){
+		Kart_Game();
+	}
+}
+#define DEBOUNCE 200
+static uint32_t last_up=0;
+static uint32_t last_down=0;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == ex_button_Pin)  // 你�?? pin ??�稱
+	uint32_t now = HAL_GetTick();
+	if (GPIO_Pin == ex_button_Pin&&(now - last_up>DEBOUNCE))  // 你�?? pin ??�稱
     {
-        jump=1;
+        up++;
+        down=0;
+    	jump=1;
+    	last_up=now;
     }
-    if(GPIO_Pin==ex_squat_btn_Pin){
+    if(GPIO_Pin==ex_squat_btn_Pin&&(now - last_down>DEBOUNCE)){
+    	up=0;
+    	down++;
     	squat=1;
+    	last_down=now;
     }
     if(GPIO_Pin==GPIO_PIN_0){
     	data_ready=1;
@@ -142,8 +197,38 @@ int main(void)
   LIS3DSH_Y_calibrate(-1020.0, 1040.0);
   LIS3DSH_Z_calibrate(-920.0, 1040.0);
   lcd_init();
+//  printf("lcd init\r\n");
 //  Dino_Init();
-  Kart_Init();
+//  Kart_Init();
+//  if(xTaskCreate(menu, "main menu", 512, NULL, 5, &menuHandle) != pdPASS) {
+//      printf("menu task create failed!\r\n");
+//  }
+//  BaseType_t ret;
+  xTaskCreate(menu,
+		  "main menu",
+		  512,
+		  NULL,
+		  4,
+		  &menuHandle);
+//  printf("menu create: %ld\r\n", ret);
+
+  xTaskCreate(Dino,
+		  "Dino_Game",
+		  1024,
+		  NULL,
+		  3,
+		  &DinoHandle);
+//  printf("dino create: %ld\r\n", ret);
+  xTaskCreate(Kart,
+  		  "Kart_Game",
+  		  1024,
+  		  NULL,
+  		  3,
+  		  &KartHandle);
+//  printf("Kart create: %ld\r\n", ret);
+  vTaskSuspend(DinoHandle);
+  vTaskSuspend(KartHandle);
+  vTaskStartScheduler();
 
   /* USER CODE END 2 */
 
@@ -155,8 +240,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 //	Dino_Game();
-	Kart_Game();
-
+//	Kart_Game();
   }
   /* USER CODE END 3 */
 }
@@ -577,6 +661,27 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM7 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM7) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

@@ -22,6 +22,7 @@ extern int8_t squat;
 void dino_map();
 void dino_move();
 void Dino_Init();
+void Dino_Game();
 //char collision(int8_t);
 //void score();
 //void set_level(uint8_t);
@@ -30,6 +31,7 @@ void Kart_Init();
 void kart_map();
 void kart_move();
 void Kart_Game();
-//void MEMS_Write(uint8_t address,uint8_t data);
-//void MEMS_Read(uint8_t address,uint8_t *data);
+
+//void menu();
+void Clear_Screen();
 #endif

@@ -190,3 +190,6 @@ void Kart_Game(){
 		col=collision();
 	}
 }
+void Clear_Screen(){
+	LCD_1IN14_Clear(0xFFFF);
+}
