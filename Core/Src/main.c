@@ -83,68 +83,123 @@ int __io_putchar(int ch)
     HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
     return ch;
 }
+
 TaskHandle_t menuHandle=NULL,DinoHandle=NULL,KartHandle=NULL;
-volatile int8_t up=0,down=0;
+volatile int8_t up=0,down=0,ret1=0,restart=0;
+
 void menu(void *pvParameters){
-	Clear_Screen();
-//	printf("in menu\r\n");
-	up=0,down=0;
 	for(;;){
-		if(up>=2){
-			up=0;
-			vTaskResume(DinoHandle);
-			vTaskSuspend(NULL);
-		}else if(up){
-			Paint_DrawString_EN(50,35,"Dino Game",&Font20,0xF800,0xFFFF);
-		}else
-			Paint_DrawString_EN(50,35,"Dino Game",&Font20,0xFFFF,0x0000);
-//		printf("up: %d\r\n",up);
-		if(down>=2){
-			down=0;
-			vTaskResume(KartHandle);
-			vTaskSuspend(NULL);
-		}else if(down){
-			Paint_DrawString_EN(50,80,"Race Game",&Font20,0xF800,0xFFFF);
-		}else
-			Paint_DrawString_EN(50,80,"Race Game",&Font20,0xFFFF,0x0000);
-//		printf("down: %d\r\n",down);
+		Clear_Screen();
+		printf("in menu\r\n");
+		up=0,down=0;
+		for(;;){
+//			printf("up=%d down=%d\r\n", up, down);
+			if(up>=2){
+				up=0;
+				printf("Dino state = %d\r\n", eTaskGetState(DinoHandle));
+				vTaskResume(DinoHandle);
+				vTaskSuspend(NULL);
+				break;
+			}else if(up){
+				Paint_DrawString_EN(50,35,"Dino Game",&Font20,0xF800,0xFFFF);
+//				printf("up\r\n");
+			}else
+				Paint_DrawString_EN(50,35,"Dino Game",&Font20,0xFFFF,0x0000);
+	//		printf("up: %d\r\n",up);
+			if(down>=2){
+				down=0;
+				vTaskResume(KartHandle);
+				vTaskSuspend(NULL);
+				break;
+			}else if(down){
+//				printf("down\r\n");
+				Paint_DrawString_EN(50,80,"Race Game",&Font20,0xF800,0xFFFF);
+			}else
+				Paint_DrawString_EN(50,80,"Race Game",&Font20,0xFFFF,0x0000);
+	//		printf("down: %d\r\n",down);
+		}
 	}
 }
 
 void Dino(void *pvParameters){
-	Clear_Screen();
-	Dino_Init();
 	for(;;){
-		Dino_Game();
+		Clear_Screen();
+		jump=0;squat=0;
+		restart=0;
+		ret1=0;
+		Dino_Init();
+		for(;;){
+			Dino_Game();
+			if(ret1){
+				ret1=0;
+				vTaskResume(menuHandle);
+				vTaskSuspend(NULL);
+				break;
+			}
+			if(restart)
+				break;
+		}
 	}
 }
 
 void Kart(void *pvParameters){
-	Clear_Screen();
-	Kart_Init();
 	for(;;){
-		Kart_Game();
+		Clear_Screen();
+		Kart_Init();
+		restart=0;
+		ret1=0;
+//		printf("ret on entry = %d\n", ret1);
+		for(;;){
+			Kart_Game();
+			if(ret1){
+				ret1=0;
+				vTaskResume(menuHandle);
+				vTaskSuspend(NULL);
+				break;
+			}
+			if(restart)
+				break;
+		}
 	}
 }
 #define DEBOUNCE 200
-static uint32_t last_up=0;
-static uint32_t last_down=0;
+static uint32_t last_up=0,last_down=0,last_ret=0,last_restart=0;
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	uint32_t now = HAL_GetTick();
+    //return button
+	if(GPIO_Pin==ret_btn_Pin&&(now - last_ret>DEBOUNCE)){
+		printf("!\r\n");
+		ret1=1;
+		last_ret=now;
+	}
+	//up button
 	if (GPIO_Pin == ex_button_Pin&&(now - last_up>DEBOUNCE))  // 你�?? pin ??�稱
     {
-        up++;
+        printf("^\r\n");
+		up++;
         down=0;
     	jump=1;
     	last_up=now;
+
     }
+	//down button
     if(GPIO_Pin==ex_squat_btn_Pin&&(now - last_down>DEBOUNCE)){
+    	printf("v\r\n");
     	up=0;
     	down++;
     	squat=1;
     	last_down=now;
     }
+    //restart button
+    if(GPIO_Pin==restart_btn_Pin&&(now - last_restart>DEBOUNCE)){
+		printf("r\r\n");
+		restart=1;
+		last_restart=now;
+    }
+
+    //motion sensor
     if(GPIO_Pin==GPIO_PIN_0){
     	data_ready=1;
     }
@@ -208,7 +263,7 @@ int main(void)
 		  "main menu",
 		  512,
 		  NULL,
-		  4,
+		  3,
 		  &menuHandle);
 //  printf("menu create: %ld\r\n", ret);
 
@@ -535,11 +590,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : ex_button_Pin */
-  GPIO_InitStruct.Pin = ex_button_Pin;
+  /*Configure GPIO pins : ex_button_Pin ret_btn_Pin restart_btn_Pin */
+  GPIO_InitStruct.Pin = ex_button_Pin|ret_btn_Pin|restart_btn_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(ex_button_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /*Configure GPIO pin : OTG_FS_PowerSwitchOn_Pin */
   GPIO_InitStruct.Pin = OTG_FS_PowerSwitchOn_Pin;

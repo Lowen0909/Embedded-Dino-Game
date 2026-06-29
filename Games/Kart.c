@@ -49,11 +49,11 @@ int16_t pos_y[][6]={
 
 static uint32_t size=sizeof(Karts)/sizeof(Karts[0]);
 static int tail=0;
-int lv=0;
+static char col=0;
+int16_t prev_y=0;
 
 static void set_level(uint8_t l){
 	tail=190;
-	lv=l;
 	for(int i=0;i<size;i++){
 		if(levels[l][i]){
 			Karts[i]->x=pos_x[l][i];
@@ -65,6 +65,13 @@ static void set_level(uint8_t l){
 	}
 }
 void Kart_Init(){
+	stage=0;
+	data_ready=0;
+	distance=0;
+	tail=0;
+	col=0;
+	prev_y=0;
+
 	RKart=(obstacle){.image=RedKart,.w=50,.h=29,.x=10,.y=52,.vis=1,.active=1};
 	BKart1=(obstacle){.image=BlueKart,.w=50,.h=29,.active=1};
 	YKart1=(obstacle){.image=YellowKart,.w=50,.h=29,.active=1};
@@ -73,11 +80,11 @@ void Kart_Init(){
 	BKart3=(obstacle){.image=BlueKart,.w=50,.h=29,.x=10,.active=1};
 	YKart3=(obstacle){.image=YellowKart,.w=50,.h=29,.active=1};
 	Paint_DrawString_EN(100,1,"Score:",&Font20,0xFFFF,0x0000);
-	Paint_DrawImage_new(RKart.image,RKart.w*RKart.h*2, RKart.x,RKart.y,RKart.w,RKart.h);
 	set_level(stage);
 	Paint_DrawString_EN(50,65,"Game Start!",&Font20,0xFFFF,0xF800);
 	DEV_Delay_ms(800);
 	Paint_DrawString_EN(50,65,"Game Start!",&Font20,0xFFFF,0xFFFF);
+	Paint_DrawImage_new(RKart.image,RKart.w*RKart.h*2, RKart.x,RKart.y,RKart.w,RKart.h);
 }
 
 
@@ -101,7 +108,7 @@ void kart_map(){
 			LCD_partial_Clear(Karts[i]->x,Karts[i]->y,Karts[i]->w,Karts[i]->h);
 		}
 		if(Karts[i]->active&&Karts[i]->x-speed<0){
-			if(i!=tail&&pos_x[lv][i]==pos_x[lv][tail])
+			if(i!=tail&&pos_x[stage][i]==pos_x[stage][tail])
 				Karts[i]->x=Karts[tail]->x;
 			else
 				Karts[i]->x=Karts[tail]->x-speed+130;
@@ -112,7 +119,7 @@ void kart_map(){
 	score();
 }
 
-int16_t prev_y=0;
+
 void kart_move(){
 	float pitch=0;
 	LIS3DSH_DataScaled myData;
@@ -120,6 +127,7 @@ void kart_move(){
 		prev_y=RKart.y;
 		data_ready=0;
 		myData = LIS3DSH_GetDataScaled();
+		printf("x:%f z:%f\r\n",myData.x,myData.z);
 		pitch = atan2f(myData.x, myData.z) * (180.0f / M_PI);
 		printf("angle is : %f\r\n",pitch);
 		if(pitch<=160&&pitch>=135)
@@ -182,7 +190,7 @@ static void score(){
 	}
 }
 
-static char col=0;
+
 void Kart_Game(){
 	if(!col){
 		kart_map();

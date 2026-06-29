@@ -17,8 +17,8 @@ typedef struct obs{
 	uint8_t active;
 }obstacle;
 
-extern int8_t jump;
-extern int8_t squat;
+extern volatile int8_t jump;
+extern volatile int8_t squat;
 void dino_map();
 void dino_move();
 void Dino_Init();

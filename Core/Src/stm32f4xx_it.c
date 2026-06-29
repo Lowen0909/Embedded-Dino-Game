@@ -144,10 +144,10 @@ void UsageFault_Handler(void)
 //void SVC_Handler(void)
 //{
 //  /* USER CODE BEGIN SVCall_IRQn 0 */
-////
+//////////////
 //  /* USER CODE END SVCall_IRQn 0 */
 //  /* USER CODE BEGIN SVCall_IRQn 1 */
-////
+//////////////
 //  /* USER CODE END SVCall_IRQn 1 */
 //}
 
@@ -170,10 +170,10 @@ void DebugMon_Handler(void)
 //void PendSV_Handler(void)
 //{
 //  /* USER CODE BEGIN PendSV_IRQn 0 */
-////
+//////////////
 //  /* USER CODE END PendSV_IRQn 0 */
 //  /* USER CODE BEGIN PendSV_IRQn 1 */
-////
+//////////////
 //  /* USER CODE END PendSV_IRQn 1 */
 //}
 //
@@ -183,11 +183,11 @@ void DebugMon_Handler(void)
 //void SysTick_Handler(void)
 //{
 //  /* USER CODE BEGIN SysTick_IRQn 0 */
-////
+//////////////
 //  /* USER CODE END SysTick_IRQn 0 */
 //
 //  /* USER CODE BEGIN SysTick_IRQn 1 */
-////
+//////////////
 //  /* USER CODE END SysTick_IRQn 1 */
 //}
 
@@ -236,6 +236,8 @@ void EXTI9_5_IRQHandler(void)
   /* USER CODE END EXTI9_5_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(ex_button_Pin);
   HAL_GPIO_EXTI_IRQHandler(ex_squat_btn_Pin);
+  HAL_GPIO_EXTI_IRQHandler(ret_btn_Pin);
+  HAL_GPIO_EXTI_IRQHandler(restart_btn_Pin);
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
 
   /* USER CODE END EXTI9_5_IRQn 1 */

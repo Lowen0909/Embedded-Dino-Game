@@ -31,11 +31,12 @@ static uint16_t levels[][6]={
 };
 uint16_t* map_num;
 static int8_t tail,head;
-int8_t jump=0,squat=0;
+volatile int8_t jump=0,squat=0;
 int8_t buzz=0;
 int16_t counter=5;
 static int32_t distance=0;
 static int8_t stage=0;
+static char col=0;
 //function definition
 static void set_level(uint8_t level){
 	map_num=levels[level];
@@ -44,7 +45,7 @@ static void set_level(uint8_t level){
 		if(map_num[i]){
 			if(prev==200)
 				head=i;
-			printf("active");
+//			printf("active");
 			obstacles[i]->active=1;
 			obstacles[i]->x=prev;
 			prev=obstacles[i]->x+obstacles[i]->w+60;
@@ -54,13 +55,14 @@ static void set_level(uint8_t level){
 }
 
 void Dino_Init(){
+	stage=0;distance=0;counter=5;col=0;
 	Boat=(obstacle){.image=boat,.w=30,.h=15,.x=200,.y=135-15,.vis=0,.active=0};
 	Runner=(obstacle){.image=runner,.w=16,.h=20,.x=200,.y=135-20,.vis=0,.active=0};
 	Cactus=(obstacle){.image=cactus,.w=24,.h=28,.x=200,.y=135-28,.vis=0,.active=0};
 	Rock=(obstacle){.image=rock,.w=16,.h=7,.x=200,.y=135-7,.vis=0,.active=0};
 	Pyrimid=(obstacle){.image=pyrimid,.w=24,.h=13,.x=200,.y=135-13,.vis=0,.active=0};
 	Meteor=(obstacle){.image=meteor,.w=12,.h=10,.x=200,.y=135-15-10,.vis=0,.active=0};
-	set_level(0);
+	set_level(stage);
 	//dino moves
 	Dino_j.image=dino_jump;Dino_j.w=26;Dino_j.h=27;Dino_j.y=135-Dino_j.h;
 	Dino_s.image=dino_squat;Dino_s.w=40;Dino_s.h=12;Dino_s.y=135-Dino_s.h;
@@ -73,7 +75,7 @@ void Dino_Init(){
 
 
 static char collision(int8_t squat){
-	printf("squat %d\r\n",squat);
+//	printf("squat %d\r\n",squat);
 	obstacle*Dino;
 	if(squat)
 		Dino=&Dino_s;
@@ -227,7 +229,7 @@ static void score(){
 
 	}
 }
-static char col=0;
+
 void Dino_Game(){
 	if(!col){
 		dino_map();
