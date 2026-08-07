@@ -84,12 +84,9 @@ static void LCD_1IN14_SendData_DMA(const unsigned char *image,uint32_t len)
     LCD_1IN14_CS_0;
     while(offset < len)
 	{
-		uint32_t chunk = (len - offset > 5000) ? 5000 : (len - offset);
-
-		memcpy(buf, &image[offset], chunk);
-
-		DEV_SPI_WRite_DMA(buf, chunk);
-
+		uint32_t chunk =(len-offset>5000)?5000:(len-offset);
+		memcpy(buf,&image[offset],chunk);
+		DEV_SPI_WRite_DMA(buf,chunk);
 		while(!spi_done);
 		spi_done=0;
 

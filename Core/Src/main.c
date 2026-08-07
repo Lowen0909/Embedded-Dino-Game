@@ -94,9 +94,11 @@ void menu(void *pvParameters){
 		up=0,down=0;
 		for(;;){
 //			printf("up=%d down=%d\r\n", up, down);
+			printf("Dino state = %d\r\n", eTaskGetState(DinoHandle));
+			printf("Kart state = %d\r\n", eTaskGetState(KartHandle));
 			if(up>=2){
 				up=0;
-				printf("Dino state = %d\r\n", eTaskGetState(DinoHandle));
+				printf("Wake Dino state = %d\r\n", eTaskGetState(DinoHandle));
 				vTaskResume(DinoHandle);
 				vTaskSuspend(NULL);
 				break;
@@ -108,6 +110,7 @@ void menu(void *pvParameters){
 	//		printf("up: %d\r\n",up);
 			if(down>=2){
 				down=0;
+				printf("Wake Kart state = %d\r\n", eTaskGetState(KartHandle));
 				vTaskResume(KartHandle);
 				vTaskSuspend(NULL);
 				break;
@@ -175,7 +178,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		last_ret=now;
 	}
 	//up button
-	if (GPIO_Pin == ex_button_Pin&&(now - last_up>DEBOUNCE))  // 你�?? pin ??�稱
+	if (GPIO_Pin == ex_button_Pin&&(now - last_up>DEBOUNCE))
     {
         printf("^\r\n");
 		up++;

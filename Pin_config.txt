@@ -1,0 +1,31 @@
+USART2_TX:PA2
+USART2_RX:PA3(NOT USED)
+
+SPI2(ST7789 LCD) Pins
+SCK(CLK):PA5
+MISO:PC2(NOT USED)
+MOSI(DIN):PB15
+
+Other ST7789 LCD Pins:
+VCC:VDD
+CS:PB6
+BL:PC7(PWM:TIM3_CH2)
+RST:PA9
+DC:PA8
+
+SPI1(LIS3DSH) Pins:
+CLK:PA5
+MISO:PA6
+MOSI:PA7
+CS:PE3
+interrupt:PE0
+
+
+
+buttons:
+squat/down:PB7
+jump/up:PE5
+return:PE8
+restart:PE9
+
+buzzer:PE4
